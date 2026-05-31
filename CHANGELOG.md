@@ -4,6 +4,42 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] — 2026-05-31
+
+Third documentation and edge-case pass after two implementation audits.
+
+### Changed
+
+- README expanded: query/collection semantics, integrity vs load errors,
+  CLI surface and limits, API contract notes, multi-instance guidance,
+  Python 3.11+ requirement, Database context-manager contract, ADR index.
+- ADR 0008 updated to list `find()` / `where()` routing and exclude
+  `check_integrity()` from transaction read-routing.
+- Missing checksum reported as `format`, not `corrupt`, in integrity checks.
+- CLI maps `QueryError` and `TransactionError` to exit code 2.
+- Load-time validation for reserved document fields, collection names, and
+  empty document ids.
+- Document-id validation on all CRUD paths; lock timeout must be positive
+  and finite at API, engine, and CLI layers.
+- `FileLock` parameter errors standardized as `ValidationError`.
+
+### Fixed
+
+- Query criteria validated even on empty collections.
+- Removed unused `CLIError` from the public API.
+- Non-finite lock timeouts (`NaN`, `+inf`) no longer accepted (previously
+  could spin forever in the lock loop).
+
+### Tests
+
+- Suite expanded to 137 tests covering API contract edges, CLI exit codes,
+  integrity format cases, transaction read-routing, and query semantics.
+
+### Documentation
+
+- Added portfolio/evaluation docs: `docs/ACCEPTANCE.md`, `docs/WHAT_I_LEARNED.md`,
+  `docs/adr/README.md`, `scripts/demo.py`, GitHub Actions CI workflow.
+
 ## [0.1.0] — 2026-05-30
 
 Initial public release. Reached through three iterated review passes
