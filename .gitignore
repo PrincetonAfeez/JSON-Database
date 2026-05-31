@@ -33,3 +33,7 @@ htmlcov/
 
 # Scope documents (local only)
 docs/scope/
+
+# Demo artifacts
+demo.jsondb
+demo.jsondb.lock
