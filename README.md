@@ -285,4 +285,4 @@ See [docs/adr/README.md](docs/adr/README.md) for the full index. Summaries:
 python -m pytest
 ```
 
-CI runs on **Ubuntu and Windows** with Python 3.11 and 3.12 (see [.github/workflows/ci.yml](.github/workflows/ci.yml)). Current suite: **137 passed**, 1 skipped.
+CI runs on **Ubuntu and Windows** with Python 3.11, 3.12, and 3.13 (see [.github/workflows/ci.yml](.github/workflows/ci.yml)). Current suite: **137 passed**, 1 skipped.
