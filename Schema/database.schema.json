@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.json-database.local/database.schema.json",
+  "title": "JSON Database File",
+  "description": "Persisted .jsondb file envelope containing metadata, a checksum, and named collections of stored documents.",
+  "type": "object",
+  "required": ["meta", "collections"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["format", "version", "created_at", "updated_at", "content_sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "format": { "const": "json_database" },
+        "version": { "const": 1 },
+        "created_at": { "$ref": "#/$defs/taggedDateTime" },
+        "updated_at": { "$ref": "#/$defs/taggedDateTime" },
+        "content_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 checksum of the canonical database state with this field set to null. The schema validates shape only, not checksum correctness."
+        }
+      }
+    },
+    "collections": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^(?!__)[A-Za-z0-9_-]+$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "description": "Object keyed by non-empty document id.",
+        "propertyNames": {
+          "type": "string",
+          "minLength": 1
+        },
+        "additionalProperties": {
+          "$ref": "./document.schema.json"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "taggedDateTime": {
+      "type": "object",
+      "required": ["__jsondb_type__", "value"],
+      "properties": {
+        "__jsondb_type__": { "const": "datetime" },
+        "value": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

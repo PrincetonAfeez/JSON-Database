@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.json-database.local/query.schema.json",
+  "title": "JSON Database Query Criteria",
+  "description": "Criteria object accepted by Collection.find() and the CLI query command. Each field maps to either an equality value or an operator expression.",
+  "type": "object",
+  "additionalProperties": {
+    "anyOf": [
+      { "$ref": "#/$defs/queryValue" },
+      { "$ref": "#/$defs/operatorExpression" }
+    ]
+  },
+  "$defs": {
+    "queryValue": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "boolean" },
+        { "type": "string" },
+        { "type": "number" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/$defs/queryValue" }
+        },
+        {
+          "type": "object",
+          "propertyNames": {
+            "not": { "pattern": "^\\$" }
+          },
+          "additionalProperties": { "$ref": "#/$defs/queryValue" }
+        }
+      ]
+    },
+    "operatorExpression": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "$eq": { "$ref": "#/$defs/queryValue" },
+        "$ne": { "$ref": "#/$defs/queryValue" },
+        "$gt": { "$ref": "#/$defs/queryValue" },
+        "$gte": { "$ref": "#/$defs/queryValue" },
+        "$lt": { "$ref": "#/$defs/queryValue" },
+        "$lte": { "$ref": "#/$defs/queryValue" },
+        "$in": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/queryValue" }
+        },
+        "$nin": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/queryValue" }
+        },
+        "$contains": { "$ref": "#/$defs/queryValue" },
+        "$exists": { "type": "boolean" }
+      }
+    }
+  }
+}

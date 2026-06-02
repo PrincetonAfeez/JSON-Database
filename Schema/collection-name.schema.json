@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.json-database.local/collection-name.schema.json",
+  "title": "JSON Database Collection Name",
+  "description": "A collection name must be non-empty, use only letters, numbers, underscore, and dash, and must not start with double underscore.",
+  "type": "string",
+  "pattern": "^(?!__)[A-Za-z0-9_-]+$"
+}
