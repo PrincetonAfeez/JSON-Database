@@ -1,0 +1,2 @@
+# Input for pip-compile; CI installs the package separately with pip install -e .
+pytest>=8.3.5

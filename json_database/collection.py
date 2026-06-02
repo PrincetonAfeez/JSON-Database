@@ -142,9 +142,7 @@ def replace_document(
 ) -> dict[str, Any]:
     validate_document(document)
     stored = copy.deepcopy(document)
-    supplied_id = stored.get("id")
-    if supplied_id is not None and supplied_id != document_id:
-        raise ValidationError("replace() cannot change document id")
+    _validate_body_id("replace", stored, document_id)
     _get_document_ref(state, collection, document_id)
     stored["id"] = document_id
     _ensure_collection(state, collection)[document_id] = stored
@@ -180,9 +178,7 @@ def upsert_document(state: dict[str, Any], collection: str, document_id: str, do
     _validate_document_id(document_id)
     validate_document(document)
     stored = copy.deepcopy(document)
-    supplied_id = stored.get("id")
-    if supplied_id is not None and supplied_id != document_id:
-        raise ValidationError("upsert() cannot change document id")
+    _validate_body_id("upsert", stored, document_id)
     stored["id"] = document_id
     _ensure_collection(state, collection)[document_id] = stored
     return document_id
@@ -210,16 +206,21 @@ def bulk_update_documents(
     if not isinstance(updates, list):
         raise ValidationError("bulk_update() expects a list of updates")
     documents = _get_collection_ref(state, collection)
-    for document_id, update in updates:
+    normalized: list[tuple[str, dict[str, Any]]] = []
+    for item in updates:
+        if not isinstance(item, (tuple, list)) or len(item) != 2:
+            raise ValidationError("bulk_update() expects (document_id, updates) pairs")
+        document_id, update = item
         _validate_document_id(document_id)
         if document_id not in documents:
             raise NotFoundError(f"document not found: {collection}/{document_id}")
         validate_document(update)
         if "id" in update:
             raise ValidationError("bulk_update() cannot change document id")
-    for document_id, update in updates:
+        normalized.append((document_id, update))
+    for document_id, update in normalized:
         documents[document_id].update(copy.deepcopy(update))
-    return len(updates)
+    return len(normalized)
 
 
 def validate_document(document: Any) -> None:
@@ -267,6 +268,11 @@ def _get_collection_ref(
             return {}
         raise NotFoundError(f"collection not found: {collection}")
     return collections[collection]
+
+
+def _validate_body_id(operation: str, stored: dict[str, Any], document_id: str) -> None:
+    if "id" in stored and stored["id"] != document_id:
+        raise ValidationError(f"{operation}() cannot change document id")
 
 
 def _validate_document_id(document_id: str) -> None:

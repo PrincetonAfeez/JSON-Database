@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.11", "3.12", "3.13"]
 
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +25,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install package and dev dependencies
-        run: python -m pip install -e ".[dev]"
+        run: |
+          python -m pip install -e .
+          python -m pip install -r requirements-dev.lock
 
       - name: Run tests
         run: python -m pytest -q --durations=10

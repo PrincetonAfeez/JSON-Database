@@ -9,13 +9,16 @@ that preserve those properties are welcome.
 ```powershell
 git clone <your-fork>
 cd "JSON Database"
-python -m pip install -e ".[dev]"
-# or: python -m pip install -r requirements-dev.txt
+python -m pip install -e .
+python -m pip install -r requirements-dev.lock
+# or: python -m pip install -e ".[dev]" for unpinned local installs
 python -m pytest
 ```
 
 Requires **Python 3.11+**. No runtime dependencies outside the standard library.
-Dev dependencies: `pytest>=8.3.5` (see `requirements-dev.txt` or `[dev]` extra).
+Dev dependencies are pinned in `requirements-dev.lock` (regenerate with
+`python -m piptools compile requirements-dev-lock.in --output-file requirements-dev.lock --strip-extras`).
+CI installs from that lockfile; `requirements-dev.txt` keeps the lower bounds for editable installs.
 
 ## Portfolio / evaluation artifacts
 
@@ -71,4 +74,4 @@ If you change `lock.py`, `atomic.py`, or `storage.py`, re-run the
 multi-process tests in `tests/test_locking.py` and
 `tests/test_concurrency.py`; those exercise the durability guarantees.
 
-CI (`.github/workflows/ci.yml`) runs `pytest` on Ubuntu and Windows with Python 3.11 and 3.12.
+CI (`.github/workflows/ci.yml`) runs `pytest` on Ubuntu and Windows with Python 3.11, 3.12, and 3.13.

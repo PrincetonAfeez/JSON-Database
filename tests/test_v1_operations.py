@@ -35,6 +35,19 @@ def test_replace_rejects_conflicting_id(tmp_path):
         users.replace(document_id, {"id": "other-id", "name": "Mia"})
 
 
+@pytest.mark.parametrize(
+    "document",
+    [{"id": None, "name": "Mia"}, {"id": "", "name": "Mia"}],
+    ids=["null-id", "empty-string-id"],
+)
+def test_replace_rejects_invalid_id_field(tmp_path, document):
+    users = Database(tmp_path / "app.jsondb").collection("users")
+    document_id = users.insert({"name": "Ava"})
+
+    with pytest.raises(ValidationError, match="cannot change document id"):
+        users.replace(document_id, document)
+
+
 def test_upsert_overwrites_existing_id(tmp_path):
     users = Database(tmp_path / "app.jsondb").collection("users")
     users.upsert("fixed-id", {"name": "Ava", "age": 20})
@@ -63,6 +76,33 @@ def test_bulk_update_rejects_non_list(tmp_path):
 
     with pytest.raises(ValidationError, match="expects a list"):
         users.bulk_update(("id", {"name": "Ava"}))
+
+
+@pytest.mark.parametrize(
+    "updates",
+    [
+        [{"name": "Ava"}],
+        [("only-id",)],
+        ["not-a-pair"],
+        [("id-1", {"name": "Ava"}, "extra")],
+        [("id-1", {"name": "Ava"}, {"name": "Mia"})],
+        [{"document_id": "id-1", "updates": {"name": "Ava"}}],
+    ],
+    ids=[
+        "dict-entry",
+        "single-item-tuple",
+        "string-entry",
+        "three-item-tuple",
+        "two-updates-one-entry",
+        "dict-shaped-entry",
+    ],
+)
+def test_bulk_update_rejects_malformed_entries(tmp_path, updates):
+    users = Database(tmp_path / "app.jsondb").collection("users")
+    users.insert({"name": "Original"})
+
+    with pytest.raises(ValidationError, match="expects \\(document_id, updates\\) pairs"):
+        users.bulk_update(updates)
 
 
 def test_non_finite_values_rejected_on_insert_and_upsert(tmp_path):
@@ -131,6 +171,18 @@ def test_upsert_rejects_conflicting_id(tmp_path):
 
     with pytest.raises(ValidationError, match="cannot change document id"):
         users.upsert("fixed-id", {"id": "other-id", "name": "Ava"})
+
+
+@pytest.mark.parametrize(
+    "document",
+    [{"id": None, "name": "Ava"}, {"id": "", "name": "Ava"}],
+    ids=["null-id", "empty-string-id"],
+)
+def test_upsert_rejects_invalid_id_field(tmp_path, document):
+    users = Database(tmp_path / "app.jsondb").collection("users")
+
+    with pytest.raises(ValidationError, match="cannot change document id"):
+        users.upsert("fixed-id", document)
 
 
 def test_bulk_insert_rejects_user_supplied_id(tmp_path):

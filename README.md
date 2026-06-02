@@ -5,8 +5,7 @@ collections, UUID primary keys, atomic writes, whole-file locks, transactions,
 custom serialization, and single-file SHA-256 integrity checks behind a reusable
 library and thin CLI.
 
-<!-- After pushing to GitHub, replace YOUR_USER/YOUR_REPO in the badge URL below. -->
-<!-- ![CI](https://github.com/YOUR_USER/YOUR_REPO/actions/workflows/ci.yml/badge.svg) -->
+![CI](https://github.com/PrincetonAfeez/JSON-Database/actions/workflows/ci.yml/badge.svg)
 
 ## Quick start (5 minutes)
 
